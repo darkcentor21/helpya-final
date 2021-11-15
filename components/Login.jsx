@@ -52,6 +52,7 @@ export default function Login({ navigation }) {
             const result = await Google.logInAsync({
                 // behavior: 'web',
                 androidClientId: '60883324779-mah4gsru374aj8h7ug8ul7o4iqnqndpe.apps.googleusercontent.com',
+                androidStandaloneAppClientId: '797497243651-9lhv45v1cc8j79k09q4dp6g39i7g9uj8.apps.googleusercontent.com',
                 // iosClientId: '60883324779-mah4gsru374aj8h7ug8ul7o4iqnqndpe.apps.googleusercontent.com',
                 scopes: ['profile', 'email'],
             });
@@ -70,7 +71,7 @@ export default function Login({ navigation }) {
 
     return (
         <View style={{ flex: 1, alignItems: 'center', justifyContent: 'center' }}>
-            <Image source={require('./Assets/logo.png')} style={{width:200, height:200}} />
+            <Image source={require('./Assets/logo.png')} style={{ width: 200, height: 200 }} />
             <Button title="Sign in with Google" onPress={signInWithGoogleAsync} />
         </View>
     )

@@ -5,14 +5,15 @@ import { useDispatch, useSelector } from "react-redux";
 import { db } from '../../firebase';
 import { collection, doc, getDocs, addDoc, updateDoc, arrayUnion, arrayRemove, query, where } from 'firebase/firestore'
 import Icon from 'react-native-vector-icons/Ionicons';
+import { NavigationContainer } from '@react-navigation/native';
 
-export default function Profile() {
+export default function Profile(navigation) {
     const dispatch = useDispatch();
 
     const logInData = useSelector((state) => state.loginReducer);
 
     const updateProfile = async () => {
-        
+
     }
 
     const handleUpdateLogin = async () => {
@@ -125,11 +126,11 @@ export default function Profile() {
                     <Text style={{ fontSize: 35, marginTop: 30 }}>{logInData.user[0].fullname}</Text>
                     <View style={{ flexDirection: 'row', marginTop: 20 }}>
                         {logInData.user[0].skills.map((row, key) =>
-                            <View style={{ backgroundColor: '#2980b9', marginRight: 5, padding: 4, borderRadius: 5, flexDirection: 'row', justifyContent:'center', alignItems:'center' }}>
+                            <View style={{ backgroundColor: '#2980b9', marginRight: 5, padding: 4, borderRadius: 5, flexDirection: 'row', justifyContent: 'center', alignItems: 'center' }}>
                                 <Text style={{ fontSize: 15, color: 'white' }}>
                                     {row}
                                 </Text>
-                                <TouchableOpacity style={{ marginLeft: 5 }} onPress={() => {removeSkill(row)}}>
+                                <TouchableOpacity style={{ marginLeft: 5 }} onPress={() => { removeSkill(row) }}>
                                     <Icon type="ionicons" name="close-circle-sharp" size={20} color="white" />
                                 </TouchableOpacity>
                             </View>
@@ -145,11 +146,26 @@ export default function Profile() {
                             <Icon type="Entypo" name="add-circle-sharp" size={30} color="#16a085" />
 
                         </TouchableOpacity>
+
                     </View>
 
                 </View>
             </View>
+            <View>
+                <TouchableOpacity
+                    onPress={() => navigation.navigate('Login')}
+                    style={
+                        {
+                            padding: 10,
+                            borderRadius: 10,
+                            justifyContent: 'center',
+                        }
+                    }>
+                    <Text>Sign Out</Text>
+                </TouchableOpacity>
+            </View>
         </View>
+
     )
 }
 

@@ -87,7 +87,7 @@ export default function Activities() {
             console.log("ResulTUpdate:" + messages)
         })
     }
-    
+
 
     const [jobs, setJobs] = useState([])
     const [requests, setRequest] = useState([])
@@ -224,7 +224,7 @@ export default function Activities() {
             </View>
             <View style={{ height: 350, padding: 10 }}>
                 <Text>Jobs for Me</Text>
-                <ScrollView style={{ marginTop: 30, padding: 20, height: '100%', width: '100%' }}>
+                <ScrollView style={{ marginTop: 30, padding: 20, height: '80%', width: '100%' }}>
                     {jobs.map((job, key) =>
                         <View key={key}>
                             <View style={{ flexDirection: 'row', marginBottom: 10 }}>

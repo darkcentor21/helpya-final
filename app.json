@@ -23,6 +23,13 @@
       "adaptiveIcon": {
         "foregroundImage": "./assets/adaptive-icon.png",
         "backgroundColor": "#FFFFFF"
+      },
+      "package": "com.helpya",
+      "config": {
+        "googleSignIn": {
+          "apiKey": "AIzaSyAItYFjrf0y-SGVGPfTMnGDH2RxFBX3Rlk",
+          "certificateHash": "F8FD464D80FADFB77AF2AD68D5A9C0F331A76D2A"
+        }
       }
     },
     "web": {
