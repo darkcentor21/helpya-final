@@ -9,7 +9,7 @@ import { collection, getDocs, doc, addDoc, query, where, updateDoc, onSnapshot, 
 import Icon from 'react-native-vector-icons/Ionicons';
 
 import moment from 'moment';
-import { fontSize, marginLeft } from 'styled-system';
+import { fontSize, left, marginLeft } from 'styled-system';
 
 export default function Activities() {
     const logInData = useSelector((state) => state.loginReducer);
@@ -123,7 +123,14 @@ export default function Activities() {
 
     return (
         <View>
+
             <View style={{ height: 350, padding: 10 }}>
+                <TouchableOpacity style={styles.refresh} onPress={() => {
+                    handleGetRequest()
+                    handleGetJobs()
+                }}>
+                    <Icon type="ionicons" name="sync" size={35} color="black" />
+                </TouchableOpacity>
                 <Text>My Requests</Text>
                 <ScrollView style={{ padding: 10, height: '100%', width: '100%' }}>
                     {requests.map((request, key) =>
@@ -222,9 +229,10 @@ export default function Activities() {
 
                 </ScrollView>
             </View>
-            <View style={{ height: 350, padding: 10 }}>
+
+            <View style={{ height: 250, padding: 10 }}>
                 <Text>Jobs for Me</Text>
-                <ScrollView style={{ marginTop: 30, padding: 20, height: '80%', width: '100%' }}>
+                <ScrollView style={{ marginTop: 20, padding: 20, height: '80%', width: '100%' }}>
                     {jobs.map((job, key) =>
                         <View key={key}>
                             <View style={{ flexDirection: 'row', marginBottom: 10 }}>
@@ -273,7 +281,7 @@ export default function Activities() {
                                                 }}
                                                 onPress={() => handleUpdateBookings("Denied", job.id)}
                                             >
-                                                <Text style={{ color: '#fff', fontSize: 10 }}>Deny Booking</Text>
+                                                <Text style={{ color: '#fff', fontSize: 10 }}>Deny</Text>
                                             </TouchableOpacity>
                                             <TouchableOpacity
                                                 style={{
@@ -287,7 +295,7 @@ export default function Activities() {
                                                 }}
                                                 onPress={() => handleUpdateBookings("Accepted", job.id)}
                                             >
-                                                <Text style={{ color: '#fff', fontSize: 10 }}>Accept Booking</Text>
+                                                <Text style={{ color: '#fff', fontSize: 10 }}>Accept</Text>
                                             </TouchableOpacity>
 
                                         </View>
@@ -349,7 +357,7 @@ export default function Activities() {
                                 }}
                                 onPress={() => setOpenChat({ open: false })}
                             >
-                                <Text style={{ color: '#fff', fontSize: 20 }}>Close</Text>
+                                <Icon type="ionicons" name="close" size={20} color="white" />
                             </TouchableOpacity>
                         </View>
                         <ScrollView style={{ flexDirection: 'column', height: '75%', width: '100%', padding: 10 }}>
@@ -381,6 +389,7 @@ export default function Activities() {
                                 value={chat}
                                 placeholder="Message"
                                 keyboardType="default"
+                                clearButtonMode='always'
                             />
                             <TouchableOpacity
                                 style={{
@@ -393,7 +402,12 @@ export default function Activities() {
                                     bottom: 0,
                                     marginLeft: 10
                                 }}
-                                onPress={() => addChat()}
+                                onPress={() =>
+                                    addChat()
+
+
+
+                                }
                             >
                                 <Text style={{ color: '#fff', fontSize: 20, textAlign: 'center' }}>Send</Text>
                             </TouchableOpacity>
@@ -410,6 +424,7 @@ const styles = StyleSheet.create({
     inputTextArea: {
         height: 40,
         width: '90%',
+        marginLeft: 10,
         // marginTop: 10,
         borderWidth: 1,
         borderColor: '#7f8c8d',
@@ -475,4 +490,9 @@ const styles = StyleSheet.create({
         alignItems: "flex-start",
         elevation: 5
     },
+    button: {
+        justifyContent: 'flex-end',
+        padding: 10,
+
+    }
 });

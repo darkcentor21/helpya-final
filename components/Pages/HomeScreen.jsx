@@ -85,6 +85,7 @@ export default function HomeScreen() {
     });
 
     return (
+
         <SafeAreaView>
             <View style={{ flex: 1, justifyContent: 'flex-start', alignItems: 'center', padding: 20 }}>
                 <TextInput
@@ -97,7 +98,7 @@ export default function HomeScreen() {
             </View>
 
 
-            <ScrollView style={{ marginTop: 30, padding: 20, height: '100%', width: '100%' }}>
+            <ScrollView style={{ paddingTop: 10, marginTop: 10, padding: 10, height: '79%', width: '100%' }}>
                 {accountSearch.map((worker, key) =>
                     <TouchableOpacity key={key} style={styles.list}
                         onPress={() => {
@@ -121,7 +122,7 @@ export default function HomeScreen() {
                                     )}
                                 </Text>
                                 <Text style={{ color: '#34495e' }}>5km Away</Text>
-                                <Text style={{ color: '#34495e', fontSize: 20, marginTop: 10 }}>{worker.rating}/<Text style={{ fontSize: 15 }}>5</Text></Text>
+
                             </View>
                         </View>
 

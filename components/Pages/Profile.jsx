@@ -7,7 +7,7 @@ import { collection, doc, getDocs, addDoc, updateDoc, arrayUnion, arrayRemove, q
 import Icon from 'react-native-vector-icons/Ionicons';
 import { NavigationContainer } from '@react-navigation/native';
 
-export default function Profile(navigation) {
+export default function Profile({ navigation }) {
     const dispatch = useDispatch();
 
     const logInData = useSelector((state) => state.loginReducer);
@@ -152,8 +152,8 @@ export default function Profile(navigation) {
                 </View>
             </View>
             <View>
-                <TouchableOpacity
-                    onPress={() => navigation.navigate('Login')}
+                {/* <TouchableOpacity
+                    onPress={() => { navigation.navigate("Login") }}
                     style={
                         {
                             padding: 10,
@@ -162,7 +162,7 @@ export default function Profile(navigation) {
                         }
                     }>
                     <Text>Sign Out</Text>
-                </TouchableOpacity>
+                </TouchableOpacity> */}
             </View>
         </View>
 
