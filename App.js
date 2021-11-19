@@ -15,16 +15,16 @@ const store = createStore(combineReducer)
 
 export default function App() {
   return (
-      <Provider store={store}>
-        <NavigationContainer>
-          <Stack.Navigator
-            screenOptions={{ headerShown: false }}
-            initialRouteName="Login"
-          >
-            <Stack.Screen name="Login" component={Login} />
-            <Stack.Screen name="Main" component={Main} />
-          </Stack.Navigator>
-        </NavigationContainer>
-      </Provider>
+    <Provider store={store}>
+      <NavigationContainer>
+        <Stack.Navigator
+          screenOptions={{ headerShown: false }}
+          initialRouteName="Login"
+        >
+          <Stack.Screen name="Login" component={Login} />
+          <Stack.Screen name="Main" component={Main} />
+        </Stack.Navigator>
+      </NavigationContainer>
+    </Provider>
   );
 }

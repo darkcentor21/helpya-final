@@ -7,7 +7,7 @@ import Ionicons from 'react-native-vector-icons/Ionicons';
 import HomeScreen from './Pages/HomeScreen';
 import Profile from './Pages/Profile';
 import Activities from './Pages/Activities';
-import About from './Pages/About';
+
 
 import { useDispatch, useSelector } from "react-redux";
 import { FAB } from 'react-native-paper'
@@ -68,7 +68,7 @@ export default function App() {
         <Tab.Screen name="Profile" component={Profile} />
         {/* <Tab.Screen name="About" component={About} /> */}
       </Tab.Navigator>
-{/* 
+      {/* 
       <FAB
         style={{
           position: 'absolute',
