@@ -51,10 +51,14 @@ export default function App() {
           tabBarStyle: {
             height: 60,
             position: 'absolute',
+<<<<<<< Updated upstream
             bottom: 16,
             right: 16,
             left: 16,
             borderRadius: 10,
+=======
+            padding: 10,
+>>>>>>> Stashed changes
           },
           headerStyle: {
             backgroundColor: '#fff',

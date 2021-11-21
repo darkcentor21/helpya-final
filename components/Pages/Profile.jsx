@@ -1,13 +1,17 @@
 import React, { useEffect, useState } from 'react'
-import { StyleSheet, View, Text, Image, TouchableOpacity, Modal, TextInput, SafeAreaProvider, Touchable, Alert } from 'react-native'
+import { StyleSheet, View, Text, Image, TouchableOpacity, Modal, TextInput, ScrollView, SafeAreaProvider, Touchable, Alert } from 'react-native'
 import { useDispatch, useSelector } from "react-redux";
 
 import { db } from '../../firebase';
 import { collection, doc, getDocs, addDoc, updateDoc, arrayUnion, arrayRemove, query, where } from 'firebase/firestore'
 import Icon from 'react-native-vector-icons/Ionicons';
+<<<<<<< Updated upstream
 import { NavigationContainer } from '@react-navigation/native';
+=======
+import { justifyContent } from 'styled-system';
+>>>>>>> Stashed changes
 
-export default function Profile({ navigation }) {
+export default function Profile() {
     const dispatch = useDispatch();
 
     const logInData = useSelector((state) => state.loginReducer);
@@ -16,11 +20,25 @@ export default function Profile({ navigation }) {
 
     }
 
+    useEffect(() => {
+        handleGetReviews()
+    }, [])
+
+    const [reviews, setReviews] = useState([])
+    const handleGetReviews = async () => {
+        const q = query(collection(db, "reviews"), where("reviewTo", "==", logInData.user[0].userId))
+        await getDocs(q).then(res => {
+            const k = res.docs.map((doc) => ({ ...doc.data(), id: doc.id }))
+            setReviews(k)
+            console.log(k)
+        })
+    }
+
+
     const handleUpdateLogin = async () => {
         const q = query(collection(db, "users"), where("userId", "==", logInData.user[0].userId))
         const getquery = await getDocs(q);
         const k = getquery.docs.map((doc) => ({ ...doc.data(), id: doc.id }))
-        console.log(k)
         dispatch({
             type: "loginData",
             data: k,
@@ -146,11 +164,14 @@ export default function Profile({ navigation }) {
                             <Icon type="Entypo" name="add-circle-sharp" size={30} color="#16a085" />
 
                         </TouchableOpacity>
-
+                    </View>
+                    <View>
+                        <Text style={{fontSize:30}}>{logInData.user[0].rating}/<Text style={{fontSize:15}}>5</Text></Text>
                     </View>
 
                 </View>
             </View>
+<<<<<<< Updated upstream
             <View>
                 {/* <TouchableOpacity
                     onPress={() => { navigation.navigate("Login") }}
@@ -165,7 +186,23 @@ export default function Profile({ navigation }) {
                 </TouchableOpacity> */}
             </View>
         </View>
+=======
 
+            <View style={styles.list}>
+>>>>>>> Stashed changes
+
+                <View style={{ flexDirection: 'column', alignItems: 'center' }}>
+                    <ScrollView style={{ padding: 10, height: '100%', width: '100%' }}>
+                        {reviews.map(review =>
+                            <View style={{flexDirection:'row', justifyContent:'space-between'}}>
+                                <Text style={{ fontSize: 15}}>{review.review}</Text>
+                                <Text style={{ fontSize: 20}}><Text>{review.rating}/</Text><Text style={{ fontSize: 15 }}>5</Text></Text>
+                            </View>
+                        )}
+                    </ScrollView>
+                </View>
+            </View>
+        </View>
     )
 }
 
