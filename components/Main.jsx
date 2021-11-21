@@ -44,20 +44,21 @@ export default function App() {
             // You can return any component that you like here!
             return <Ionicons name={iconName} size={size} color={color} />;
           },
-          tabBarShowLabel: false,
+          tabBarShowLabel: true,
           tabBarActiveTintColor: '#16a085',
           tabBarInactiveTintColor: '#34495e',
           // headerShown:false,
           tabBarStyle: {
             height: 60,
             position: 'absolute',
-            bottom: 16,
-            right: 16,
-            left: 16,
             borderRadius: 10,
+            padding: 10,
           },
           headerStyle: {
             backgroundColor: '#fff',
+          },
+          tabBarShowLabel: {
+
           }
 
 

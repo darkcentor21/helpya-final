@@ -6,6 +6,8 @@ import { db } from '../../firebase';
 import { collection, doc, getDocs, addDoc, updateDoc, arrayUnion, arrayRemove, query, where } from 'firebase/firestore'
 import Icon from 'react-native-vector-icons/Ionicons';
 import { NavigationContainer } from '@react-navigation/native';
+import { flex } from 'styled-system';
+import Unorderedlist from 'react-native-unordered-list';
 
 export default function Profile({ navigation }) {
     const dispatch = useDispatch();
@@ -26,7 +28,7 @@ export default function Profile({ navigation }) {
             data: k,
         });
     }
-
+    const [modalOpen, setModelOpen] = useState(false)
     const [newSkill, setNewSkill] = useState("")
     const [openUpdateSkills, setUpdateSkill] = useState(false)
     const addSkill = async () => {
@@ -114,16 +116,18 @@ export default function Profile({ navigation }) {
 
 
 
+
             <View style={styles.list}>
 
-                <View style={{ flexDirection: 'column', alignItems: 'center' }}>
+                <View style={{ flexDirection: 'column', height: 50, alignItems: 'center' }}>
                     <Image
                         source={{
                             uri: logInData.user[0].photo
                         }}
                         style={{ width: 100, height: 100, borderRadius: 400 / 2 }}
                     />
-                    <Text style={{ fontSize: 35, marginTop: 30 }}>{logInData.user[0].fullname}</Text>
+                    <Text style={{ fontSize: 30, marginTop: 30 }}>{logInData.user[0].fullname}</Text>
+                    <Text style={{ fontSize: 15, marginTop: 10 }}>Press the Button to Add skills or Specify if Client</Text>
                     <View style={{ flexDirection: 'row', marginTop: 20 }}>
                         {logInData.user[0].skills.map((row, key) =>
                             <View style={{ backgroundColor: '#2980b9', marginRight: 5, padding: 4, borderRadius: 5, flexDirection: 'row', justifyContent: 'center', alignItems: 'center' }}>
@@ -145,6 +149,7 @@ export default function Profile({ navigation }) {
                         }} onPress={() => setUpdateSkill(true)}>
                             <Icon type="Entypo" name="add-circle-sharp" size={30} color="#16a085" />
 
+
                         </TouchableOpacity>
 
                     </View>
@@ -152,19 +157,32 @@ export default function Profile({ navigation }) {
                 </View>
             </View>
             <View>
-                {/* <TouchableOpacity
-                    onPress={() => { navigation.navigate("Login") }}
-                    style={
-                        {
-                            padding: 10,
-                            borderRadius: 10,
-                            justifyContent: 'center',
-                        }
-                    }>
-                    <Text>Sign Out</Text>
-                </TouchableOpacity> */}
-            </View>
-        </View>
+                <TouchableOpacity style={{ backgroundColor: '#2980b9', marginRight: 5, padding: 4, borderRadius: 5, justifyContent: 'center', alignItems: 'center', }} onPress={() => setModelOpen(true)}>
+                    <Text style={{ color: 'white', }}>About Helpya</Text>
+                </TouchableOpacity>
+                <Modal style visible={modalOpen}
+                    animationType='slide'>
+
+                    <View style={StyleSheet.modal}>
+                        <TouchableOpacity style={{ flexDirection: 'row', justifyContent: 'flex-end', alignSelf: 'flex-end' }} onPress={() => setModelOpen(false)}>
+                            <Icon type="ionicons" name="close" size={45} color="black" />
+                        </TouchableOpacity>
+                        <View style={{ flex: 1, alignItems: 'center', justifyContent: 'center', padding: 20 }}>
+                            <Image source={require('../Assets/logo.png')} style={{ width: 200, height: 200 }} />
+                        </View>
+                        <Text style={{ padding: 40, fontSize: 24, }}>Helpya is a crowdsourcing application that allows clients to search for manual laborers based on their skills and hire them depending on the client’s needs.</Text>
+                        <Text style={{ marginLeft: 10, fontSize: 20, }}>Helpya allows you to:</Text>
+                        <Unorderedlist bulletUnicode={0x2022} style={{ marginLeft: 25, fontSize: 30, }}><Text style={{ fontSize: 20 }}>Allows you to Select a specific manual laborer that suits your needs.</Text></Unorderedlist>
+                        <Unorderedlist bulletUnicode={0x2022} style={{ marginLeft: 25, fontSize: 30, }}><Text style={{ fontSize: 20 }}>Freedom to choose the jobs that you want to do.</Text></Unorderedlist>
+                        <Unorderedlist bulletUnicode={0x2022} style={{ marginLeft: 25, fontSize: 30, }}><Text style={{ fontSize: 20 }}>Communicate with your selected Worker.</Text></Unorderedlist>
+
+                    </View>
+                </Modal>
+
+
+
+            </View >
+        </View >
 
     )
 }

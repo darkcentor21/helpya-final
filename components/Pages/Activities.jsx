@@ -92,6 +92,7 @@ export default function Activities() {
     const [jobs, setJobs] = useState([])
     const [requests, setRequest] = useState([])
 
+
     const handleGetRequest = async () => {
         const q = query(collection(db, "jobs"), where("client.userId", "==", logInData.user[0].userId))
         await getDocs(q).then((res) => {
@@ -119,19 +120,41 @@ export default function Activities() {
             handleGetRequest();
         })
     }
+    const [modalOpen, setOpenModal] = useState({
+        modalOpen,
+        open: false,
+    })
+    const [activeJobreview, setActiveJobReview] = useState("")
+    const openReviewBox = (jobId) => {
+        setOpenModal(true),
+            setActiveJobReview(jobId)
+    }
+    const [reviews, setReview] = useState([])
+    const addReview = async (review, id) => {
+        const reviewDoc = doc(db, "jobs", id);
+        await updateDoc(reviewDoc, {
+            review: reviews.reviewUser
+        }).then((res) => {
+            handleGetJobs();
+            handleGetRequest();
+        })
+    }
+
 
 
     return (
         <View>
 
             <View style={{ height: 350, padding: 10 }}>
-                <TouchableOpacity style={styles.refresh} onPress={() => {
+
+                <Text>My Requests</Text>
+                <TouchableOpacity style={{ flexDirection: 'row', justifyContent: 'flex-end', alignSelf: 'flex-end' }} onPress={() => {
                     handleGetRequest()
                     handleGetJobs()
                 }}>
                     <Icon type="ionicons" name="sync" size={35} color="black" />
                 </TouchableOpacity>
-                <Text>My Requests</Text>
+
                 <ScrollView style={{ padding: 10, height: '100%', width: '100%' }}>
                     {requests.map((request, key) =>
                         <View key={key}
@@ -167,6 +190,7 @@ export default function Activities() {
                                         </Text>
                                     </View>
                                     <View style={{ flexWrap: 'wrap', alignItems: 'flex-start', width: '90%' }}>
+
                                         <Text style={{ color: '#34495e', fontSize: 12 }}>{request.description}</Text>
                                     </View>
 
@@ -192,6 +216,9 @@ export default function Activities() {
                                         >
                                             <Icon type="ionicons" name="chatbubble-ellipses" size={20} color="white" />
                                         </TouchableOpacity>
+                                        <TouchableOpacity animationType='slide' onPress={() => openReviewBox(jobId)} >
+                                            <Text>Review User</Text>
+                                        </TouchableOpacity>
                                     </View>
                                     {request.status === "Accepted"
                                         ?
@@ -212,7 +239,9 @@ export default function Activities() {
                                             </TouchableOpacity>
                                         </View>
                                         :
-                                        <View></View>
+                                        <View>
+
+                                        </View>
                                     }
 
                                 </View>
@@ -255,6 +284,7 @@ export default function Activities() {
                                         </Text>
                                     </View>
                                     <View style={{ flexWrap: 'wrap', alignItems: 'flex-start', width: '90%' }}>
+                                        <Text style={{ color: '#34495e', fontSize: 12 }}>{job.address}</Text>
                                         <Text style={{ color: '#34495e', fontSize: 12 }}>{job.description}</Text>
                                     </View>
 
@@ -281,7 +311,7 @@ export default function Activities() {
                                                 }}
                                                 onPress={() => handleUpdateBookings("Denied", job.id)}
                                             >
-                                                <Text style={{ color: '#fff', fontSize: 10 }}>Deny</Text>
+                                                <Text style={{ color: '#fff', fontSize: 10 }}>Deny Job</Text>
                                             </TouchableOpacity>
                                             <TouchableOpacity
                                                 style={{
@@ -295,7 +325,7 @@ export default function Activities() {
                                                 }}
                                                 onPress={() => handleUpdateBookings("Accepted", job.id)}
                                             >
-                                                <Text style={{ color: '#fff', fontSize: 10 }}>Accept</Text>
+                                                <Text style={{ color: '#fff', fontSize: 10 }}>Accept Job </Text>
                                             </TouchableOpacity>
 
                                         </View>
@@ -327,6 +357,7 @@ export default function Activities() {
                                 }}
                             />
                         </View>
+
 
                     )}
                 </ScrollView>
@@ -414,6 +445,26 @@ export default function Activities() {
                         </View>
                     </View>
                 </View>
+            </Modal>
+            <Modal animationType='slide' visible={activeJobreview}>
+                <TouchableOpacity style={{ flexDirection: 'row', justifyContent: 'flex-end', alignSelf: 'flex-end' }} onPress={() => setOpenModal()}>
+                    <Icon type="ionicons" name="close" size={45} color="black" />
+                </TouchableOpacity>
+                <Text>Review User</Text>
+                <TextInput value={reviews}
+                    style={styles.inputTextArea}
+                    multiline={true}
+                    numberOfLines={4}
+                    onChangeText={(text) => {
+                        setReview(text)
+                    }}
+                    value={reviews}
+                    placeholder="Review"
+                    keyboardType="default"
+                    clearButtonMode='always' />
+                <TouchableOpacity onPress={() => addReview(reviews, jobId)}>
+                    Send Review
+                </TouchableOpacity>
             </Modal>
 
         </View>

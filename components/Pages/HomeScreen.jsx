@@ -57,7 +57,8 @@ export default function HomeScreen() {
             dateEnd: Timestamp.fromDate(new Date(dateEnd)),
             worker: selectedWorker,
             client: logInData.user[0],
-            status: 'Pending'
+            status: 'Pending',
+            review: ''
         }).then((res) => {
             setUserModal(!openUserModal);
             Alert.alert(
@@ -85,20 +86,24 @@ export default function HomeScreen() {
     });
 
     return (
-
         <SafeAreaView>
             <View style={{ flex: 1, justifyContent: 'flex-start', alignItems: 'center', padding: 20 }}>
                 <TextInput
                     style={styles.input}
-                    placeholder="Search"
+                    placeholder="Search for specific skills"
                     onChangeText={(text) => {
                         setSearch(text)
                     }}
                 />
+                <View>
+                    <Text style={{ fontSize: 14, padding: 20, marginBottom: 15, }}>List of Available Workers</Text>
+                </View>
+
             </View>
 
 
-            <ScrollView style={{ paddingTop: 10, marginTop: 10, padding: 10, height: '79%', width: '100%' }}>
+            <ScrollView style={{ marginTop: 50, padding: 10, height: '74%', width: '100%' }}>
+
                 {accountSearch.map((worker, key) =>
                     <TouchableOpacity key={key} style={styles.list}
                         onPress={() => {
@@ -121,7 +126,7 @@ export default function HomeScreen() {
                                         worker.skills.length === key + 1 ? skill + '' : skill + ', '
                                     )}
                                 </Text>
-                                <Text style={{ color: '#34495e' }}>5km Away</Text>
+
 
                             </View>
                         </View>
@@ -139,7 +144,7 @@ export default function HomeScreen() {
                 visible={openUserModal}
                 onRequestClose={() => {
                     // Alert.alert("Modal has been closed.");
-                    setModalVisible(!openUserModal);
+                    setUserModal(!openUserModal);
                 }}
             >
                 <View style={{}}>
@@ -160,9 +165,9 @@ export default function HomeScreen() {
                                         selectedWorker.skills.length === key + 1 ? skill + '' : skill + ', '
                                     )}
                                 </Text>
-                                <Text style={{ color: '#34495e' }}>5km Away</Text>
+
                             </View>
-                            <Text style={{ color: '#34495e', fontSize: 20, marginLeft: 50 }}>{selectedWorker.rating}/<Text style={{ fontSize: 15 }}>5</Text></Text>
+
 
                         </View>
                         {/* <View style={{ flexDirection: 'row', height:300 }}> */}
