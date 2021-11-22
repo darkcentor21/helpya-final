@@ -96,7 +96,7 @@ export default function HomeScreen() {
                     }}
                 />
                 <View>
-                    <Text style={{ fontSize: 14, padding: 20, marginBottom: 15, }}>List of Available Workers</Text>
+                    <Text style={{ fontSize: 14, padding: 20, marginBottom: 15, }}>List of Available Workers and Clients</Text>
                 </View>
 
             </View>
@@ -105,12 +105,14 @@ export default function HomeScreen() {
             <ScrollView style={{ marginTop: 50, padding: 10, height: '74%', width: '100%' }}>
 
                 {accountSearch.map((worker, key) =>
+
                     <TouchableOpacity key={key} style={styles.list}
                         onPress={() => {
                             setUserModal(true)
                             setSelectedWorker(worker)
 
                         }}
+
                     >
                         <View style={{ flexDirection: 'row' }}>
                             <Image
@@ -126,6 +128,7 @@ export default function HomeScreen() {
                                         worker.skills.length === key + 1 ? skill + '' : skill + ', '
                                     )}
                                 </Text>
+                                <Text style={{ color: '#34495e', fontSize: 20, marginTop: 10 }}>{worker.rating.toFixed(0)}/<Text style={{ fontSize: 15 }}>5</Text></Text>
 
 
                             </View>

@@ -1,19 +1,16 @@
-import React, { useEffect, useState } from 'react'
-import { View, Text, TextInput, Modal, Button, Alert, StyleSheet, ScrollView, Image, TouchableOpacity } from 'react-native'
-import { useForm, Controller } from "react-hook-form";
-import { FAB } from 'react-native-paper'
-import DatePicker from 'react-native-date-picker'
-import { useDispatch, useSelector } from "react-redux";
-import { db } from '../../firebase';
-import { collection, getDocs, doc, addDoc, query, where, updateDoc, onSnapshot, arrayUnion, Timestamp } from 'firebase/firestore'
-import Icon from 'react-native-vector-icons/Ionicons';
-
+import { addDoc, arrayUnion, collection, doc, getDocs, onSnapshot, query, Timestamp, updateDoc, where } from 'firebase/firestore';
 import moment from 'moment';
-import { fontSize, left, marginLeft } from 'styled-system';
+import React, { useEffect, useState } from 'react';
+import { Alert, Image, Modal, ScrollView, StyleSheet, Text, TextInput, TouchableOpacity, View, Picker } from 'react-native';
+import Icon from 'react-native-vector-icons/Ionicons';
+import { useSelector } from "react-redux";
+import { db } from '../../firebase';
+
 
 export default function Activities() {
     const logInData = useSelector((state) => state.loginReducer);
     const messageCollectionRef = collection(db, "messaging");
+    const ReviewsCollectionRef = collection(db, "reviews")
 
     useEffect(() => {
         handleGetRequest();
@@ -120,24 +117,77 @@ export default function Activities() {
             handleGetRequest();
         })
     }
-    const [modalOpen, setOpenModal] = useState({
-        modalOpen,
-        open: false,
+    const [modalOpen, setOpenModal] = useState(false)
+    const [activeJobreview, setActiveJobReview] = useState({
+        jobId: "",
+        userId: "",
+        rating: "",
+        userDocId: ""
     })
-    const [activeJobreview, setActiveJobReview] = useState("")
-    const openReviewBox = (jobId) => {
-        setOpenModal(true),
-            setActiveJobReview(jobId)
-    }
-    const [reviews, setReview] = useState([])
-    const addReview = async (review, id) => {
-        const reviewDoc = doc(db, "jobs", id);
-        await updateDoc(reviewDoc, {
-            review: reviews.reviewUser
-        }).then((res) => {
-            handleGetJobs();
-            handleGetRequest();
+    const openReviewBox = async (jobId, userId, rating, userDocId) => {
+        setOpenModal(true);
+
+        const q = query(collection(db, "users"), where("userId", "==", userId))
+        let userData = []
+        await getDocs(q).then(res => {
+            const k = res.docs.map((doc) => ({ ...doc.data(), id: doc.id }))
+            userData = k
         })
+
+        console.log(userData)
+        setActiveJobReview({
+            jobId: jobId,
+            userId: userId,
+            rating: parseFloat(userData[0].rating),
+            userDocId: userDocId
+        })
+    }
+
+
+    const [review, setReview] = useState("")
+    const [rating, setRating] = useState(5)
+
+    const addReview = async () => {
+
+        await addDoc(ReviewsCollectionRef, {
+            review: review,
+            reviewedBy: logInData.user[0].userId,
+            reviewTo: activeJobreview.userId,
+            rating: rating,
+            jobId: activeJobreview.jobId,
+            dateReview: Timestamp.fromDate(new Date()),
+        })
+
+        const userDoc = doc(db, "users", activeJobreview.userDocId);
+        const jobDoc = doc(db, "jobs", activeJobreview.jobId);
+
+        let newRating = rating
+
+        if (activeJobreview.rating != 0) {
+            newRating = parseFloat((rating + parseFloat(activeJobreview.rating)) / 2)
+        } else {
+            newRating = rating
+        }
+
+        await updateDoc(jobDoc, {
+            "worker.rating": newRating
+        })
+
+        await updateDoc(userDoc, {
+            rating: newRating
+        }).then((res1) => {
+            setOpenModal(false);
+            Alert.alert(
+                "Success",
+                `Review has been saved Successfully ${rating}`,
+            );
+        }).catch((error) => {
+            Alert.alert(
+                "Error",
+                error.message
+            );
+        })
+
     }
 
 
@@ -216,9 +266,24 @@ export default function Activities() {
                                         >
                                             <Icon type="ionicons" name="chatbubble-ellipses" size={20} color="white" />
                                         </TouchableOpacity>
-                                        <TouchableOpacity animationType='slide' onPress={() => openReviewBox(jobId)} >
-                                            <Text>Review User</Text>
-                                        </TouchableOpacity>
+                                        {request.worker.rating === 0 && request.status === "Finished" ?
+                                            <TouchableOpacity
+                                                style={{
+                                                    backgroundColor: '#16a085',
+                                                    padding: 5,
+                                                    borderRadius: 4,
+                                                    marginLeft: 5,
+                                                    bottom: 0,
+                                                }}
+                                                onPress={() => openReviewBox(request.id, request.worker.userId, request.worker.rating, request.worker.id)} >
+                                                <Text style={{ color: 'white' }}>Review User</Text>
+                                            </TouchableOpacity>
+
+                                            :
+                                            <View></View>
+
+                                        }
+
                                     </View>
                                     {request.status === "Accepted"
                                         ?
@@ -446,25 +511,60 @@ export default function Activities() {
                     </View>
                 </View>
             </Modal>
-            <Modal animationType='slide' visible={activeJobreview}>
-                <TouchableOpacity style={{ flexDirection: 'row', justifyContent: 'flex-end', alignSelf: 'flex-end' }} onPress={() => setOpenModal()}>
-                    <Icon type="ionicons" name="close" size={45} color="black" />
-                </TouchableOpacity>
-                <Text>Review User</Text>
-                <TextInput value={reviews}
-                    style={styles.inputTextArea}
-                    multiline={true}
-                    numberOfLines={4}
-                    onChangeText={(text) => {
-                        setReview(text)
-                    }}
-                    value={reviews}
-                    placeholder="Review"
-                    keyboardType="default"
-                    clearButtonMode='always' />
-                <TouchableOpacity onPress={() => addReview(reviews, jobId)}>
-                    Send Review
-                </TouchableOpacity>
+            <Modal animationType='slide' visible={modalOpen}>
+
+                <View style={styles.modalView}>
+                    <View style={{ height: 50, flexDirection: 'row', justifyContent: 'flex-end', alignSelf: 'flex-end' }}>
+                        <TouchableOpacity style={{ flexDirection: 'row', justifyContent: 'flex-end', alignSelf: 'flex-end' }} onPress={() => setOpenModal(false)}>
+                            <Icon type="ionicons" name="close" size={45} color="black" />
+                        </TouchableOpacity>
+                    </View>
+                    <Text>{activeJobreview.rating}</Text>
+                    <View style={{ height: 120 }}>
+                        <TextInput
+                            style={styles.inputTextArea}
+                            multiline={true}
+                            numberOfLines={4}
+                            onChangeText={(text) => {
+                                setReview(text)
+                            }}
+                            value={review}
+                            placeholder="Review"
+                            keyboardType="default"
+                            clearButtonMode='always' />
+                    </View>
+
+
+                    <View style={{ height: 60, flexDirection: 'row' }}>
+                        <Text style={{ marginTop: 15, marginRight: 20, fontSize: 20 }}>Rating:</Text>
+                        <Picker
+                            selectedValue={rating}
+                            style={{ height: 50, width: 100 }}
+                            onValueChange={(itemValue, itemIndex) => setRating(itemValue)}
+                        >
+                            <Picker.Item label="5" value={5} />
+                            <Picker.Item label="4" value={4} />
+                            <Picker.Item label="3" value={3} />
+                            <Picker.Item label="2" value={2} />
+                            <Picker.Item label="1" value={1} />
+                        </Picker>
+                    </View>
+                    { }
+                    <TouchableOpacity style={{
+                        backgroundColor: '#16a085',
+                        padding: 5,
+                        width: 100,
+                        // height: 35,
+                        borderRadius: 4,
+                        justifyContent: 'flex-end',
+                        marginTop: 10,
+                        bottom: 0,
+                        marginLeft: 10
+                    }} onPress={() => addReview()}>
+                        <Text style={{ color: 'white' }}>Send Review</Text>
+                    </TouchableOpacity>
+                </View>
+
             </Modal>
 
         </View>
@@ -473,13 +573,13 @@ export default function Activities() {
 
 const styles = StyleSheet.create({
     inputTextArea: {
-        height: 40,
-        width: '90%',
-        marginLeft: 10,
-        // marginTop: 10,
+        height: 50,
+        width: 270,
+        marginTop: 10,
         borderWidth: 1,
         borderColor: '#7f8c8d',
-        padding: 10,
+        paddingTop: 15,
+        paddingLeft: 25,
         borderRadius: 15,
         color: '#7f8c8d',
         backgroundColor: '#fff',

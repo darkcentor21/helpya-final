@@ -1,15 +1,14 @@
 import React, { useEffect, useState } from 'react'
-import { StyleSheet, View, Text, Image, TouchableOpacity, Modal, TextInput, SafeAreaProvider, Touchable, Alert } from 'react-native'
+import { StyleSheet, View, Text, Image, TouchableOpacity, Modal, TextInput, ScrollView, SafeAreaProvider, Touchable, Alert } from 'react-native'
 import { useDispatch, useSelector } from "react-redux";
 
 import { db } from '../../firebase';
 import { collection, doc, getDocs, addDoc, updateDoc, arrayUnion, arrayRemove, query, where } from 'firebase/firestore'
 import Icon from 'react-native-vector-icons/Ionicons';
-import { NavigationContainer } from '@react-navigation/native';
-import { flex } from 'styled-system';
-import Unorderedlist from 'react-native-unordered-list';
+import { justifyContent } from 'styled-system';
+import Unorderedlist from 'react-native-unordered-list'
 
-export default function Profile({ navigation }) {
+export default function Profile() {
     const dispatch = useDispatch();
 
     const logInData = useSelector((state) => state.loginReducer);
@@ -18,17 +17,31 @@ export default function Profile({ navigation }) {
 
     }
 
+    useEffect(() => {
+        handleGetReviews()
+    }, [])
+
+    const [reviews, setReviews] = useState([])
+    const handleGetReviews = async () => {
+        const q = query(collection(db, "reviews"), where("reviewTo", "==", logInData.user[0].userId))
+        await getDocs(q).then(res => {
+            const k = res.docs.map((doc) => ({ ...doc.data(), id: doc.id }))
+            setReviews(k)
+            console.log(k)
+        })
+    }
+
+
     const handleUpdateLogin = async () => {
         const q = query(collection(db, "users"), where("userId", "==", logInData.user[0].userId))
         const getquery = await getDocs(q);
         const k = getquery.docs.map((doc) => ({ ...doc.data(), id: doc.id }))
-        console.log(k)
         dispatch({
             type: "loginData",
             data: k,
         });
     }
-    const [modalOpen, setModelOpen] = useState(false)
+
     const [newSkill, setNewSkill] = useState("")
     const [openUpdateSkills, setUpdateSkill] = useState(false)
     const addSkill = async () => {
@@ -57,6 +70,7 @@ export default function Profile({ navigation }) {
 
         handleUpdateLogin()
     }
+    const [modalOpen, setOpenModal] = useState(false)
 
     return (
         <View style={{ flex: 1, padding: 20 }}>
@@ -77,7 +91,8 @@ export default function Profile({ navigation }) {
                                 onChangeText={(text) => setNewSkill(text)}
                                 value={newSkill}
                                 style={{ textAlign: 'center', fontSize: 20 }}
-                                placeholder="Input Skill Here, (eg. Mason, Carpenter, Pipe Fitter)"
+                                multiline={true}
+                                placeholder="Input your Skill Here, (eg. Mason, Carpenter, Pipe Fitter)"
                                 keyboardType="default"
                             />
                         </View>
@@ -116,18 +131,17 @@ export default function Profile({ navigation }) {
 
 
 
-
             <View style={styles.list}>
 
-                <View style={{ flexDirection: 'column', height: 50, alignItems: 'center' }}>
+                <View style={{ flexDirection: 'column', alignItems: 'center' }}>
                     <Image
                         source={{
                             uri: logInData.user[0].photo
                         }}
                         style={{ width: 100, height: 100, borderRadius: 400 / 2 }}
                     />
-                    <Text style={{ fontSize: 30, marginTop: 30 }}>{logInData.user[0].fullname}</Text>
-                    <Text style={{ fontSize: 15, marginTop: 10 }}>Press the Button to Add skills or Specify if Client</Text>
+                    <Text style={{ fontSize: 24, marginTop: 30 }}>{logInData.user[0].fullname}</Text>
+                    <Text>Press the Button to Add Skills</Text>
                     <View style={{ flexDirection: 'row', marginTop: 20 }}>
                         {logInData.user[0].skills.map((row, key) =>
                             <View style={{ backgroundColor: '#2980b9', marginRight: 5, padding: 4, borderRadius: 5, flexDirection: 'row', justifyContent: 'center', alignItems: 'center' }}>
@@ -149,22 +163,40 @@ export default function Profile({ navigation }) {
                         }} onPress={() => setUpdateSkill(true)}>
                             <Icon type="Entypo" name="add-circle-sharp" size={30} color="#16a085" />
 
-
                         </TouchableOpacity>
-
+                    </View>
+                    <View>
+                        <Text style={{ fontSize: 30 }}>{logInData.user[0].rating.toFixed(1)}/<Text style={{ fontSize: 15 }}>5</Text></Text>
                     </View>
 
                 </View>
             </View>
             <View>
-                <TouchableOpacity style={{ backgroundColor: '#2980b9', marginRight: 5, padding: 4, borderRadius: 5, justifyContent: 'center', alignItems: 'center', }} onPress={() => setModelOpen(true)}>
+                <TouchableOpacity style={{ backgroundColor: '#2980b9', marginRight: 5, padding: 4, borderRadius: 5, justifyContent: 'center', alignItems: 'center', }} onPress={() => setOpenModal(true)}>
                     <Text style={{ color: 'white', }}>About Helpya</Text>
                 </TouchableOpacity>
+            </View>
+
+            <View style={styles.list}>
+
+                <View style={{ flexDirection: 'column', alignItems: 'center' }}>
+                    <ScrollView style={{ padding: 10, height: '100%', width: '100%' }}>
+                        {reviews.map(review =>
+                            <View style={{ flexDirection: 'row', justifyContent: 'space-between' }}>
+                                <Text style={{ fontSize: 15 }}>{review.review}</Text>
+                                <Text style={{ fontSize: 20 }}><Text>{review.rating}/</Text><Text style={{ fontSize: 15 }}>5</Text></Text>
+                            </View>
+                        )}
+                    </ScrollView>
+                </View>
+            </View>
+            <View>
+
                 <Modal style visible={modalOpen}
                     animationType='slide'>
 
                     <View style={StyleSheet.modal}>
-                        <TouchableOpacity style={{ flexDirection: 'row', justifyContent: 'flex-end', alignSelf: 'flex-end' }} onPress={() => setModelOpen(false)}>
+                        <TouchableOpacity style={{ flexDirection: 'row', justifyContent: 'flex-end', alignSelf: 'flex-end' }} onPress={() => setOpenModal(false)}>
                             <Icon type="ionicons" name="close" size={45} color="black" />
                         </TouchableOpacity>
                         <View style={{ flex: 1, alignItems: 'center', justifyContent: 'center', padding: 20 }}>
@@ -182,8 +214,7 @@ export default function Profile({ navigation }) {
 
 
             </View >
-        </View >
-
+        </View>
     )
 }
 
@@ -218,6 +249,7 @@ const styles = StyleSheet.create({
         padding: 15,
         backgroundColor: 'white',
         color: '#fff',
+        marginTop: 10,
         borderRadius: 20,
         marginBottom: 10,
         shadowColor: "#000",
