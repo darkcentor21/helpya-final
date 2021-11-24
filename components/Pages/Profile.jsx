@@ -116,26 +116,13 @@ export default function Profile() {
         })();
     }, []);
 
-    const pickImage = async () => {
-        let file = await ImagePicker.launchImageLibraryAsync({
-            mediaTypes: ImagePicker.MediaTypeOptions.All,
-            //allowsEditing: true,
-            //aspect: [4, 3],
-            //quality: 1,
-
-        });
-
-        console.log(file);
-        const storage = getStorage();
-        const storageRef = ref(storage, `file/${file.uri}.jpg`)
 
 
-        if (!file.cancelled) {
-            uploadBytes(storageRef, file).then((snapshot) => {
-                console.log(file);
-            });
-        }
-    };
+
+
+
+
+
 
     // Get a reference to the storage service, which is used to create references in your storage bucket
 
