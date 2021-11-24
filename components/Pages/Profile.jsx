@@ -2,20 +2,25 @@ import React, { useEffect, useState } from 'react'
 import { StyleSheet, View, Text, Image, TouchableOpacity, Modal, TextInput, ScrollView, SafeAreaProvider, Touchable, Alert } from 'react-native'
 import { useDispatch, useSelector } from "react-redux";
 
-import { db } from '../../firebase';
+import { db, storage } from '../../firebase';
 import { collection, doc, getDocs, addDoc, updateDoc, arrayUnion, arrayRemove, query, where } from 'firebase/firestore'
 import Icon from 'react-native-vector-icons/Ionicons';
-import { justifyContent } from 'styled-system';
+import { borderWidth, justifyContent, padding, paddingBottom } from 'styled-system';
 import Unorderedlist from 'react-native-unordered-list'
+import { alignItems } from 'styled-system';
+import * as ImagePicker from 'expo-image-picker';
+import { getStorage, ref, uploadBytesResumable, getDownloadURL, uploadBytes } from "firebase/storage";
 
 export default function Profile() {
     const dispatch = useDispatch();
 
     const logInData = useSelector((state) => state.loginReducer);
 
-    const updateProfile = async () => {
 
-    }
+
+
+    // Create a storage reference from our storage service
+
 
     useEffect(() => {
         handleGetReviews()
@@ -71,9 +76,74 @@ export default function Profile() {
         handleUpdateLogin()
     }
     const [modalOpen, setOpenModal] = useState(false)
+    const [newRate, setRate] = useState({
+    })
+    const addRate = async () => {
+        const userDoc = doc(db, "users", logInData.user[0].id);
+        await updateDoc(userDoc, {
+            rate: newRate
+        });
+
+        handleUpdateLogin()
+    }
+    const [newAge, setAge] = useState([])
+    const addAge = async () => {
+        const userDoc = doc(db, "users", logInData.user[0].id);
+        await updateDoc(userDoc, {
+            age: newAge
+        });
+
+        handleUpdateLogin()
+    }
+    const [newInfo, setInfo] = useState([])
+    const addInfo = async () => {
+        const userDoc = doc(db, "users", logInData.user[0].id);
+        await updateDoc(userDoc, {
+            info: newInfo
+        });
+
+        handleUpdateLogin()
+    }
+
+    useEffect(() => {
+        (async () => {
+            if (Platform.OS !== 'web') {
+                const { status } = await ImagePicker.requestMediaLibraryPermissionsAsync();
+                if (status !== 'granted') {
+                    alert('Sorry, we need camera roll permissions to make this work!');
+                }
+            }
+        })();
+    }, []);
+
+    const pickImage = async () => {
+        let file = await ImagePicker.launchImageLibraryAsync({
+            mediaTypes: ImagePicker.MediaTypeOptions.All,
+            //allowsEditing: true,
+            //aspect: [4, 3],
+            //quality: 1,
+
+        });
+
+        console.log(file);
+        const storage = getStorage();
+        const storageRef = ref(storage, `file/${file.uri}.jpg`)
+
+
+        if (!file.cancelled) {
+            uploadBytes(storageRef, file).then((snapshot) => {
+                console.log(file);
+            });
+        }
+    };
+
+    // Get a reference to the storage service, which is used to create references in your storage bucket
+
+
+
 
     return (
-        <View style={{ flex: 1, padding: 20 }}>
+        <ScrollView style={{ flex: 1, padding: 20, backgroundColor: "#ffcf93" }}>
             <Modal
                 animationType="slide"
                 transparent={true}
@@ -86,6 +156,7 @@ export default function Profile() {
                 <View style={styles.centeredView}>
                     <View style={styles.modalView}>
                         <View>
+
                             <TextInput
                                 // style={styles.input}
                                 onChangeText={(text) => setNewSkill(text)}
@@ -164,23 +235,85 @@ export default function Profile() {
                             <Icon type="Entypo" name="add-circle-sharp" size={30} color="#16a085" />
 
                         </TouchableOpacity>
+
+                    </View>
+                    <View>
+
                     </View>
                     <View>
                         <Text style={{ fontSize: 30 }}>{logInData.user[0].rating.toFixed(1)}/<Text style={{ fontSize: 15 }}>5</Text></Text>
                     </View>
 
+
                 </View>
             </View>
-            <View>
-                <TouchableOpacity style={{ backgroundColor: '#2980b9', marginRight: 5, padding: 4, borderRadius: 5, justifyContent: 'center', alignItems: 'center', }} onPress={() => setOpenModal(true)}>
-                    <Text style={{ color: 'white', }}>About Helpya</Text>
-                </TouchableOpacity>
-            </View>
+            <View style={styles.infoList}>
+                <View style={{ flexDirection: 'row', paddingBottom: 15 }}>
+                    <Text style={{ padding: 5 }}>Set Hourly Rate:</Text>
+                    <TextInput style={{ borderWidth: 1, width: 50, height: 35, borderRadius: 10, paddingLeft: 8, paddingRight: 8, }}
+                        placeholder={logInData.user[0].rate}
+                        value={newRate}
+                        onChangeText={(text) => {
+                            setRate(text)
+                        }}
 
+                    />
+                    <Text style={{ padding: 5 }} > per hr </Text>
+                    <TouchableOpacity style={styles.button} onPress={() => addRate()}>
+                        <Text style={{ color: 'white' }}>Set Rate</Text>
+                    </TouchableOpacity>
+
+
+                </View>
+
+                <View style={styles.age}>
+                    <Text style={{ padding: 5 }}  >Set Age:</Text>
+                    <TextInput style={{ borderWidth: 1, width: 50, height: 35, borderRadius: 10, paddingLeft: 8, }}
+                        placeholder={logInData.user[0].age}
+                        value={newAge}
+                        onChangeText={(text) => {
+                            setAge(text)
+                        }}
+
+                    />
+
+                    <TouchableOpacity style={styles.button} onPress={() => addAge()}>
+                        <Text style={{ color: 'white' }} >Set Age</Text>
+                    </TouchableOpacity>
+
+
+                </View>
+                <View>
+                    <Text style={{ padding: 5 }}>Info:</Text>
+                    <TextInput style={{ borderWidth: 1, width: 50, height: 100, width: '100%', borderRadius: 10, paddingLeft: 8, }}
+                        placeholder="Short description about yourself"
+                        value={newInfo}
+                        multiline={true}
+
+                        onChangeText={(text) => {
+                            setInfo(text)
+                        }}
+
+                    />
+                    <TouchableOpacity style={styles.applyButton} onPress={() => addInfo()
+
+                    }>
+                        <Text style={{ color: 'white', justifyContent: 'center' }} >Apply Info</Text>
+                    </TouchableOpacity>
+                    <TouchableOpacity style={styles.button} onPress={pickImage}>
+                        <Text>Upload Valid Id Image</Text>
+                    </TouchableOpacity>
+
+                </View>
+
+
+
+            </View>
             <View style={styles.list}>
 
                 <View style={{ flexDirection: 'column', alignItems: 'center' }}>
                     <ScrollView style={{ padding: 10, height: '100%', width: '100%' }}>
+                        <Text style={{ fontSize: 20 }}>Reviews:</Text>
                         {reviews.map(review =>
                             <View style={{ flexDirection: 'row', justifyContent: 'space-between' }}>
                                 <Text style={{ fontSize: 15 }}>{review.review}</Text>
@@ -214,7 +347,7 @@ export default function Profile() {
 
 
             </View >
-        </View>
+        </ScrollView>
     )
 }
 
@@ -261,5 +394,49 @@ const styles = StyleSheet.create({
         shadowRadius: 2.22,
         // justifyContent: 'flex-start',
         flexDirection: 'column'
+    },
+    infoList: {
+        height: 350,
+        width: "100%",
+        padding: 15,
+        backgroundColor: 'white',
+        color: '#fff',
+        marginTop: 10,
+        borderRadius: 20,
+        marginBottom: 10,
+        shadowColor: "#000",
+        shadowOffset: {
+            width: 0,
+            height: 1,
+        },
+        shadowOpacity: 0.22,
+        shadowRadius: 2.22,
+        // justifyContent: 'flex-start',
+        flexDirection: 'column',
+        justifyContent: 'flex-start',
+        alignItems: 'stretch'
+    },
+    button: {
+        padding: 10,
+        backgroundColor: "#16a085",
+        marginLeft: 15,
+        color: 'white',
+        borderRadius: 15
+
+
+    },
+    applyButton: {
+        padding: 10,
+        marginTop: 10,
+        backgroundColor: "#16a085",
+        color: 'white',
+        borderRadius: 15,
+        justifyContent: 'center',
+        alignItems: 'center'
+
+
+    },
+    age: {
+        flexDirection: 'row'
     }
 });

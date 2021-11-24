@@ -86,8 +86,8 @@ export default function HomeScreen() {
     });
 
     return (
-        <SafeAreaView>
-            <View style={{ flex: 1, justifyContent: 'flex-start', alignItems: 'center', padding: 20 }}>
+        <SafeAreaView style={{ flex: 1, backgroundColor: "#ffcf93" }}>
+            <View style={{ marginTop: 20, flex: 1, justifyContent: 'flex-start', alignItems: 'center', padding: 20, marginBottom: 10 }}>
                 <TextInput
                     style={styles.input}
                     placeholder="Search for specific skills"
@@ -95,14 +95,10 @@ export default function HomeScreen() {
                         setSearch(text)
                     }}
                 />
-                <View>
-                    <Text style={{ fontSize: 14, padding: 20, marginBottom: 15, }}>List of Available Workers and Clients</Text>
-                </View>
 
             </View>
 
-
-            <ScrollView style={{ marginTop: 50, padding: 10, height: '74%', width: '100%' }}>
+            <ScrollView style={{ marginTop: 10, padding: 10, height: '74%', width: '100%', marginBottom: 65 }}>
 
                 {accountSearch.map((worker, key) =>
 
@@ -128,7 +124,10 @@ export default function HomeScreen() {
                                         worker.skills.length === key + 1 ? skill + '' : skill + ', '
                                     )}
                                 </Text>
-                                <Text style={{ color: '#34495e', fontSize: 20, marginTop: 10 }}>{worker.rating.toFixed(0)}/<Text style={{ fontSize: 15 }}>5</Text></Text>
+
+                                <Text style={{ color: '#34495e', fontSize: 16, }}>Worker's Rate:<Text style={{ color: '#34495e', fontSize: 16, marginTop: 2 }}>₱ {worker.rate} per hour</Text></Text>
+                                <Text style={{ color: '#34495e', fontSize: 16, }}>Age:<Text style={{ color: '#34495e', fontSize: 16, marginTop: 2 }}>{worker.age} </Text></Text>
+                                <Text style={{ color: '#34495e', fontSize: 16, }}>{worker.rating.toFixed(0)}/<Text style={{ fontSize: 15 }}>5</Text></Text>
 
 
                             </View>
@@ -284,7 +283,7 @@ const styles = StyleSheet.create({
         margin: 0,
 
         height: '100%',
-        backgroundColor: "white",
+        backgroundColor: "#FFA730",
 
         padding: 35,
         alignItems: "flex-start",
@@ -322,7 +321,7 @@ const styles = StyleSheet.create({
         backgroundColor: '#fff'
     },
     list: {
-        height: 120,
+        height: 140,
         width: "100%",
         padding: 15,
         backgroundColor: 'white',

@@ -47,7 +47,7 @@ export default function App() {
           tabBarShowLabel: true,
           tabBarActiveTintColor: '#16a085',
           tabBarInactiveTintColor: '#34495e',
-          // headerShown:false,
+          headerShown: false,
           tabBarStyle: {
             height: 60,
             position: 'absolute',

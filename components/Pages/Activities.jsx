@@ -1,9 +1,10 @@
 import { addDoc, arrayUnion, collection, doc, getDocs, onSnapshot, query, Timestamp, updateDoc, where } from 'firebase/firestore';
 import moment from 'moment';
 import React, { useEffect, useState } from 'react';
-import { Alert, Image, Modal, ScrollView, StyleSheet, Text, TextInput, TouchableOpacity, View, Picker } from 'react-native';
+import { Alert, Image, Modal, ScrollView, StyleSheet, Text, TextInput, TouchableOpacity, View, Picker, SafeAreaView } from 'react-native';
 import Icon from 'react-native-vector-icons/Ionicons';
 import { useSelector } from "react-redux";
+import { alignItems, marginBottom, marginRight, marginTop } from 'styled-system';
 import { db } from '../../firebase';
 
 
@@ -193,28 +194,37 @@ export default function Activities() {
 
 
     return (
-        <View>
+        <SafeAreaView style={{ flex: 1, backgroundColor: "#ffcf93" }}>
 
-            <View style={{ height: 350, padding: 10 }}>
+            <View style={{ height: 350, }}>
+                <View style={{ flexDirection: 'row' }}>
+                    <Text style={{ fontSize: 24, color: 'black', marginTop: 30, marginBottom: 10, marginLeft: 10, marginRight: 50 }}>My Requests</Text>
 
-                <Text>My Requests</Text>
-                <TouchableOpacity style={{ flexDirection: 'row', justifyContent: 'flex-end', alignSelf: 'flex-end' }} onPress={() => {
-                    handleGetRequest()
-                    handleGetJobs()
-                }}>
-                    <Icon type="ionicons" name="sync" size={35} color="black" />
-                </TouchableOpacity>
+                    <TouchableOpacity style={{ marginLeft: 150, marginTop: 30, }} onPress={() => {
+                        handleGetRequest()
+                        handleGetJobs()
+                    }}>
+
+                        <Icon type="ionicons" name="sync" size={35} color="white" />
+                    </TouchableOpacity>
+
+
+
+                </View>
+
+
 
                 <ScrollView style={{ padding: 10, height: '100%', width: '100%' }}>
                     {requests.map((request, key) =>
-                        <View key={key}
+                        <View style={{ marginBottom: 10 }} key={key}
                             onPress={() => {
                                 setUserModal(true)
                                 setSelectedWorker(worker)
 
                             }}
                         >
-                            <View style={{ flexDirection: 'row', marginBottom: 10 }}>
+
+                            <View style={{ flexDirection: 'row', backgroundColor: 'white', padding: 10, borderRadius: 10, height: 140 }}>
                                 <Image
                                     source={{
                                         uri: request.worker.photo
@@ -311,24 +321,17 @@ export default function Activities() {
 
                                 </View>
                             </View>
-                            <View
-                                style={{
-                                    borderBottomColor: '#2c3e50',
-                                    borderBottomWidth: 1,
-                                    marginBottom: 10
-                                }}
-                            />
                         </View>
                     )}
 
                 </ScrollView>
             </View>
 
-            <View style={{ height: 250, padding: 10 }}>
-                <Text>Jobs for Me</Text>
-                <ScrollView style={{ marginTop: 20, padding: 20, height: '80%', width: '100%' }}>
+            <View style={{ height: 340, padding: 10 }}>
+                <Text style={{ flexDirection: 'row', alignSelf: 'flex-start', fontSize: 24, color: 'black', marginBottom: 10 }} >Jobs for Me</Text>
+                <ScrollView>
                     {jobs.map((job, key) =>
-                        <View key={key}>
+                        <View style={{ backgroundColor: 'white', padding: 10, borderRadius: 10, marginTop: 10, height: 170, }} key={key}>
                             <View style={{ flexDirection: 'row', marginBottom: 10 }}>
                                 <View style={{ flexDirection: 'column', marginLeft: 20 }}>
                                     <Text style={{ color: '#34495e', fontSize: 15 }}>{job.client.fullname}</Text>
@@ -398,29 +401,62 @@ export default function Activities() {
                                         : <View></View>
 
                                     }
+                                    {job.status === "Pending" && job.status === "Accepted" ?
+
+                                        <View style={{ justifyContent: 'flex-start', flexDirection: 'row' }}>
+                                            <TouchableOpacity
+                                                style={{
+                                                    backgroundColor: '#e67e22',
+                                                    padding: 5,
+                                                    borderRadius: 4,
+                                                    marginRight: 5,
+                                                    marginTop: 10,
+                                                    marginBottom: 10,
+                                                    bottom: 0,
+                                                    width: 65
+                                                }}
+                                                onPress={() => handleUpdateBookings("Denied", job.id)}
+                                            >
+                                                <Text style={{ color: '#fff', fontSize: 10 }}>Deny Job</Text>
+                                            </TouchableOpacity>
+                                            <TouchableOpacity
+                                                style={{
+                                                    backgroundColor: '#16a085',
+                                                    padding: 5,
+                                                    borderRadius: 4,
+                                                    marginBottom: 10,
+                                                    marginTop: 10,
+                                                    bottom: 0,
+                                                    width: 73
+                                                }}
+                                                onPress={() => handleUpdateBookings("Accepted", job.id)}
+                                            >
+                                                <Text style={{ color: '#fff', fontSize: 10 }}>Accept Job </Text>
+                                            </TouchableOpacity>
+
+                                        </View>
+
+                                        : <View></View>
+
+                                    }
+
                                     <TouchableOpacity
                                         style={{
                                             backgroundColor: '#16a085',
                                             padding: 5,
                                             borderRadius: 4,
-                                            marginLeft: 5,
                                             bottom: 0,
-                                            width: 20
+                                            width: 30,
+                                            marginTop: 10,
+                                            marginBottom: 10,
                                         }}
                                         onPress={() => openMessages(job.id, job.client.fullname)}
                                     >
-                                        <Icon type="ionicons" name="chatbubble-ellipses" size={10} color="white" />
+                                        <Icon type="ionicons" name="chatbubble-ellipses" size={20} color="white" />
                                     </TouchableOpacity>
 
                                 </View>
                             </View>
-                            <View
-                                style={{
-                                    borderBottomColor: '#2c3e50',
-                                    borderBottomWidth: 1,
-                                    marginBottom: 10
-                                }}
-                            />
                         </View>
 
 
@@ -439,7 +475,7 @@ export default function Activities() {
                 }}
             >
                 <View style={{}}>
-                    <View style={styles.modalView}>
+                    <View style={styles.chatmodalView}>
                         <View style={{ height: '5%', flexDirection: 'row', justifyContent: 'flex-end', alignSelf: 'flex-end' }}>
                             <TouchableOpacity
                                 style={{
@@ -456,13 +492,14 @@ export default function Activities() {
                                 <Icon type="ionicons" name="close" size={20} color="white" />
                             </TouchableOpacity>
                         </View>
-                        <ScrollView style={{ flexDirection: 'column', height: '75%', width: '100%', padding: 10 }}>
+                        <ScrollView style={{ flexDirection: 'column', height: '75%', width: '100%', padding: 10, }}>
+
                             {messages.map(message =>
                                 message.messages.map(chat =>
                                     <View style={{ marginBottom: 25, alignItems: chat.sender === logInData.user[0].userId ? 'flex-end' : 'flex-start' }}>
                                         <Text style={{
                                             color: chat.sender === logInData.user[0].userId ? 'white' : 'black',
-                                            backgroundColor: chat.sender === logInData.user[0].userId ? '#2980b9' : '#bdc3c7',
+                                            backgroundColor: chat.sender === logInData.user[0].userId ? '#5ebf95' : '#f2f2f2',
                                             flexWrap: 'wrap',
                                             textAlign: chat.sender === logInData.user[0].userId ? 'right' : 'left',
                                             borderRadius: 10, width: 200, padding: 10
@@ -474,9 +511,9 @@ export default function Activities() {
 
                             )}
                         </ScrollView>
-                        <View style={{ height: '20%', flexDirection: 'row', justifyContent: 'flex-end', padding: 20 }}>
+                        <View style={{ height: '20%', flexDirection: 'row', justifyContent: 'flex-end', padding: 20, marginLeft: 20 }}>
                             <TextInput
-                                style={styles.inputTextArea}
+                                style={styles.chatinputTextArea}
                                 multiline={true}
                                 numberOfLines={4}
                                 onChangeText={(text) => {
@@ -487,14 +524,16 @@ export default function Activities() {
                                 keyboardType="default"
                                 clearButtonMode='always'
                             />
+
                             <TouchableOpacity
                                 style={{
                                     backgroundColor: '#16a085',
-                                    padding: 5,
-                                    height: 35,
-                                    borderRadius: 4,
+                                    padding: 7.5,
+                                    height: 50,
+                                    width: 50,
+                                    borderRadius: 100,
                                     justifyContent: 'flex-end',
-                                    // marginTop: 10,
+                                    marginTop: 5,
                                     bottom: 0,
                                     marginLeft: 10
                                 }}
@@ -505,7 +544,7 @@ export default function Activities() {
 
                                 }
                             >
-                                <Text style={{ color: '#fff', fontSize: 20, textAlign: 'center' }}>Send</Text>
+                                <Icon style={{ alignSelf: 'center', paddingBottom: 5 }} type="ionicons" name="send" size={20} color="white" />
                             </TouchableOpacity>
                         </View>
                     </View>
@@ -567,7 +606,7 @@ export default function Activities() {
 
             </Modal>
 
-        </View>
+        </SafeAreaView >
     )
 }
 
@@ -584,6 +623,19 @@ const styles = StyleSheet.create({
         color: '#7f8c8d',
         backgroundColor: '#fff',
         textAlignVertical: 'top'
+    },
+    chatinputTextArea: {
+        height: 50,
+        width: '88%',
+        marginTop: 10,
+        borderWidth: 1,
+        borderColor: '#7f8c8d',
+        paddingTop: 15,
+        paddingLeft: 25,
+        borderRadius: 15,
+        color: '#7f8c8d',
+        backgroundColor: '#fff',
+        textAlignVertical: 'top',
     },
     label: {
         color: 'white',
@@ -641,6 +693,19 @@ const styles = StyleSheet.create({
         alignItems: "flex-start",
         elevation: 5
     },
+    chatmodalView: {
+
+        margin: 0,
+
+        height: '100%',
+        backgroundColor: "white",
+        width: '100%',
+        padding: 10,
+        alignItems: "flex-start",
+        elevation: 5,
+        backgroundColor: "#b3f9db"
+    },
+
     button: {
         justifyContent: 'flex-end',
         padding: 10,
